@@ -18,49 +18,52 @@ class Windags < Formula
 
     node = Formula["node"].opt_bin/"node"
 
-    # MCP server binary — wraps node + the bundled mcp-server entry
-    (bin/"windags-mcp").write <<~EOS
+    # Build script files in buildpath, chmod, then bin.install — Homebrew's
+    # canonical pattern for write+exec (avoids post-install perm audit stripping
+    # exec bits when the file is created directly under bin/).
+
+    (buildpath/"windags-mcp").write <<~EOS
       #!/bin/bash
       exec "#{node}" "#{libexec}/mcp-server/index.js" "$@"
     EOS
-    chmod 0755, bin/"windags-mcp"
 
-    # init wrapper: runs the cross-tool installer (Claude Code, Codex, Gemini, Cursor)
-    (bin/"windags-init").write <<~EOS
+    (buildpath/"windags-init").write <<~EOS
       #!/bin/bash
       exec "#{libexec}/scripts/install.sh" "$@"
     EOS
-    chmod 0755, bin/"windags-init"
 
-    # Top-level CLI dispatcher
-    (bin/"windags").write <<~EOS
+    (buildpath/"windags").write <<~EOS
       #!/bin/bash
       cmd="$1"; shift || true
       case "$cmd" in
-        init)    exec "#{bin}/windags-init" "$@" ;;
-        mcp)     exec "#{bin}/windags-mcp" "$@" ;;
+        init)    exec "#{HOMEBREW_PREFIX}/bin/windags-init" "$@" ;;
+        mcp)     exec "#{HOMEBREW_PREFIX}/bin/windags-mcp" "$@" ;;
         version) echo "windags v2.4.0 — 478 skills" ;;
         ""|help|-h|--help)
           cat <<HELP
-windags — DAG orchestration + specialist skills for AI coding agents
+      windags — DAG orchestration + specialist skills for AI coding agents
 
-USAGE
-  windags init       Wire skills into Claude Code, Cursor, Codex, Gemini CLI
-  windags mcp        Run the MCP server (stdio)
-  windags version    Print version
-  windags help       This message
+      USAGE
+        windags init       Wire skills into Claude Code, Cursor, Codex, Gemini CLI
+        windags mcp        Run the MCP server (stdio)
+        windags version    Print version
+        windags help       This message
 
-NEXT STEP
-  windags init                                   # link skills into ~/.claude, ~/.codex, ~/.gemini
-  claude mcp add windags -- windags-mcp          # register the MCP server with Claude Code
+      NEXT STEP
+        windags init                                   # link skills into ~/.claude, ~/.codex, ~/.gemini
+        claude mcp add windags -- windags-mcp          # register the MCP server with Claude Code
 
-Docs: https://windags.ai
-HELP
+      Docs: https://windags.ai
+      HELP
           ;;
         *) echo "windags: unknown command '$cmd' (try: windags help)" >&2; exit 2 ;;
       esac
     EOS
-    chmod 0755, bin/"windags"
+
+    chmod 0755, buildpath/"windags"
+    chmod 0755, buildpath/"windags-init"
+    chmod 0755, buildpath/"windags-mcp"
+    bin.install "windags", "windags-init", "windags-mcp"
   end
 
   def caveats
