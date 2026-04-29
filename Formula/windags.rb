@@ -1,8 +1,8 @@
 class Windags < Formula
   desc "DAG orchestration + 478 specialist skills for Claude Code, Cursor, Codex, Gemini CLI"
   homepage "https://windags.ai"
-  url "https://github.com/curiositech/windags-skills/archive/refs/tags/v2.4.0.tar.gz"
-  sha256 "60fa8930ef415ff89f3ccbb5f1528139d0ca2ad56485e58a90b6058abe6c905e"
+  url "https://github.com/curiositech/windags-skills/archive/refs/tags/v2.4.1.tar.gz"
+  sha256 "3143cb24db0eb99eeb2c2af4f451220871b7268affe9e0f1669a48ddc6f424ca"
   license "BUSL-1.1"
   head "https://github.com/curiositech/windags-skills.git", branch: "main"
 
@@ -38,7 +38,7 @@ class Windags < Formula
       case "$cmd" in
         init)    exec "#{HOMEBREW_PREFIX}/bin/windags-init" "$@" ;;
         mcp)     exec "#{HOMEBREW_PREFIX}/bin/windags-mcp" "$@" ;;
-        version) echo "windags v2.4.0 — 478 skills" ;;
+        version) echo "windags v2.4.1 — 478 skills" ;;
         ""|help|-h|--help)
           cat <<HELP
       windags — DAG orchestration + specialist skills for AI coding agents
