@@ -1,8 +1,8 @@
 class Windags < Formula
-  desc "DAG orchestration + 534 specialist skills for Claude Code, Cursor, Codex, Gemini CLI"
+  desc "DAG orchestration + 533 specialist skills (5-stage local cascade) for Claude Code, Cursor, Codex, Gemini CLI"
   homepage "https://windags.ai"
-  url "https://github.com/curiositech/windags-skills/archive/refs/tags/v2.6.0.tar.gz"
-  sha256 "039d4b3717253201d67778d241b5b0fb77649d5f7e4b59af9759faa181750c91"
+  url "https://github.com/curiositech/windags-skills/archive/refs/tags/v2.7.0.tar.gz"
+  sha256 "ca98e8f57ab528393c379f40f07fc1c1ffbef5dd9bf665d009357d0cc22d23c6"
   license "BUSL-1.1"
   head "https://github.com/curiositech/windags-skills.git", branch: "main"
 
@@ -38,7 +38,7 @@ class Windags < Formula
       case "$cmd" in
         init)    exec "#{HOMEBREW_PREFIX}/bin/windags-init" "$@" ;;
         mcp)     exec "#{HOMEBREW_PREFIX}/bin/windags-mcp" "$@" ;;
-        version) echo "windags v2.6.0 — 534 skills · local cascade (BM25 + MiniLM + RRF)" ;;
+        version) echo "windags v2.7.0 — 533 skills · 5-stage cascade (BM25 + MiniLM + RRF + cross-encoder + attribution)" ;;
         ""|help|-h|--help)
           cat <<HELP
       windags — DAG orchestration + specialist skills for AI coding agents
@@ -85,6 +85,6 @@ class Windags < Formula
     assert_predicate libexec/"mcp-server/index.js", :exist?
     assert_predicate libexec/"plugin.json", :exist?
     assert_predicate libexec/"skills", :exist?
-    assert_match "v2.6.0", shell_output("#{bin}/windags version")
+    assert_match "v2.7.0", shell_output("#{bin}/windags version")
   end
 end
