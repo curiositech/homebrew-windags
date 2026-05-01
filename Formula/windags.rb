@@ -1,8 +1,8 @@
 class Windags < Formula
-  desc "DAG orchestration + 533 specialist skills (5-stage local cascade) for Claude Code, Cursor, Codex, Gemini CLI"
+  desc "DAG orchestration + 544 specialist skills (5-stage local cascade) for Claude Code, Cursor, Codex, Gemini CLI"
   homepage "https://windags.ai"
-  url "https://github.com/curiositech/windags-skills/archive/refs/tags/v2.7.0.tar.gz"
-  sha256 "ca98e8f57ab528393c379f40f07fc1c1ffbef5dd9bf665d009357d0cc22d23c6"
+  url "https://github.com/curiositech/windags-skills/archive/refs/tags/v2.8.1.tar.gz"
+  sha256 "6166e70709e2e2b9f049ed0dd6b60a94a31423b3a484a832279f98832763785d"
   license "BUSL-1.1"
   head "https://github.com/curiositech/windags-skills.git", branch: "main"
 
@@ -22,14 +22,17 @@ class Windags < Formula
     # canonical pattern for write+exec (avoids post-install perm audit stripping
     # exec bits when the file is created directly under bin/).
 
+    # Use opt_libexec (stable `/opt/homebrew/opt/windags/libexec` path) instead of
+    # libexec (versioned Cellar path). Symlinks created by install.sh resolve through
+    # this stable path, so they survive `brew upgrade` instead of becoming dangling.
     (buildpath/"windags-mcp").write <<~EOS
       #!/bin/bash
-      exec "#{node}" "#{libexec}/mcp-server/index.js" "$@"
+      exec "#{node}" "#{opt_libexec}/mcp-server/index.js" "$@"
     EOS
 
     (buildpath/"windags-init").write <<~EOS
       #!/bin/bash
-      exec "#{libexec}/scripts/install.sh" "$@"
+      exec "#{opt_libexec}/scripts/install.sh" "$@"
     EOS
 
     (buildpath/"windags").write <<~EOS
@@ -38,7 +41,7 @@ class Windags < Formula
       case "$cmd" in
         init)    exec "#{HOMEBREW_PREFIX}/bin/windags-init" "$@" ;;
         mcp)     exec "#{HOMEBREW_PREFIX}/bin/windags-mcp" "$@" ;;
-        version) echo "windags v2.7.0 — 533 skills · 5-stage cascade (BM25 + MiniLM + RRF + cross-encoder + attribution)" ;;
+        version) echo "windags v2.8.1 — 544 skills · 5-stage cascade · 9-tool MCP (BM25 + MiniLM + RRF + cross-encoder + attribution)" ;;
         ""|help|-h|--help)
           cat <<HELP
       windags — DAG orchestration + specialist skills for AI coding agents
@@ -66,6 +69,21 @@ class Windags < Formula
     bin.install "windags", "windags-init", "windags-mcp"
   end
 
+  def post_install
+    # Re-link skills + agents into ~/.claude, ~/.codex, ~/.gemini after every
+    # install/upgrade. Two reasons:
+    #   1. New skills shipped in this version get linked without the user
+    #      remembering to re-run `windags init`.
+    #   2. The wrappers above use opt_libexec, so re-running here refreshes the
+    #      symlinks against the stable opt path on first install.
+    install_sh = opt_libexec/"scripts/install.sh"
+    return unless install_sh.exist?
+    return if ENV["HOME"].nil? || ENV["HOME"].empty?
+
+    ohai "Linking WinDAGs skills into agent dirs (~/.claude, ~/.codex, ~/.gemini)"
+    system install_sh.to_s
+  end
+
   def caveats
     <<~EOS
       WinDAGs installed. Two more steps to wire it up:
@@ -85,6 +103,6 @@ class Windags < Formula
     assert_predicate libexec/"mcp-server/index.js", :exist?
     assert_predicate libexec/"plugin.json", :exist?
     assert_predicate libexec/"skills", :exist?
-    assert_match "v2.7.0", shell_output("#{bin}/windags version")
+    assert_match "v2.8.1", shell_output("#{bin}/windags version")
   end
 end
