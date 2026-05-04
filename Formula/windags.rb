@@ -1,8 +1,8 @@
 class Windags < Formula
-  desc "DAG orchestration + 544 specialist skills (5-stage local cascade) for Claude Code, Cursor, Codex, Gemini CLI"
+  desc "DAG orchestration + 545 specialist skills (5-stage local cascade + headless /next-move) for Claude Code, Cursor, Codex, Gemini CLI"
   homepage "https://windags.ai"
-  url "https://github.com/curiositech/windags-skills/archive/refs/tags/v2.9.0.tar.gz"
-  sha256 "ca6876342f5cbcc9a175504147aadf6d7b268c864e3cfebf3eb6a233e6b635e2"
+  url "https://github.com/curiositech/windags-skills/archive/refs/tags/v2.10.0.tar.gz"
+  sha256 "a3586b833d22367b1f6ff993802911f9f34ff866aafc135befc76f9f42c9edb3"
   license "BUSL-1.1"
   head "https://github.com/curiositech/windags-skills.git", branch: "main"
 
@@ -41,7 +41,7 @@ class Windags < Formula
       case "$cmd" in
         init)    exec "#{HOMEBREW_PREFIX}/bin/windags-init" "$@" ;;
         mcp)     exec "#{HOMEBREW_PREFIX}/bin/windags-mcp" "$@" ;;
-        version) echo "windags v2.9.0 — 544 skills · 5-stage cascade · 9-tool MCP + next_move prompt (BM25 + MiniLM + RRF + cross-encoder + attribution)" ;;
+        version) echo "windags v2.10.0 — 545 skills · 5-stage cascade · 10-tool MCP + next_move prompt + headless run-pipeline (Anthropic/OpenAI/Google/+) (BM25 + MiniLM + RRF + cross-encoder + attribution)" ;;
         ""|help|-h|--help)
           cat <<HELP
       windags — DAG orchestration + specialist skills for AI coding agents
@@ -103,6 +103,6 @@ class Windags < Formula
     assert_predicate libexec/"mcp-server/index.js", :exist?
     assert_predicate libexec/"plugin.json", :exist?
     assert_predicate libexec/"skills", :exist?
-    assert_match "v2.9.0", shell_output("#{bin}/windags version")
+    assert_match "v2.10.0", shell_output("#{bin}/windags version")
   end
 end
